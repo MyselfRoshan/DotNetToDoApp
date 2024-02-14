@@ -1,0 +1,20 @@
+@model TodoViewModel
+
+<form asp-action="Insert"  id="form-action" method="post" role="form">
+@* <form hx-post="/Home/Create" hx-target="#todoItems" id="form-action" method="post" role="form"> *@
+    <div asp-validation-summary="All"></div>
+    <label for="inputList" class="form-label">Enter your List</label>
+    <div class="input-group mb-3">
+        <input type="text" class="form-control" asp-for="TodoItem.Title" id="inputList"
+            placeholder="Add new item ..." />
+        <span asp-validation-for="TodoItem.Title"></span>
+        <button type="submit"
+            class="btn-plus btn btn-primary text-bold d-flex align-items-center justify-content-center" type="button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus"
+                viewBox="0 0 16 16">
+                <path
+                    d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4" />
+            </svg>
+        </button>
+    </div>
+</form>
