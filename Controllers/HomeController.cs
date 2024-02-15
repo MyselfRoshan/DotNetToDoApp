@@ -92,13 +92,14 @@ public class HomeController(ILogger<HomeController> logger) : Controller
     }
 
     [HttpPost]
-    public RedirectResult Create(TodoItem todoItem)
+    public JsonResult Create(string title)
     {
+        TodoItem todoItem = new();
         var con = new NpgsqlConnection(_connectionString);
         con.Open();
 
-        var cmd = new NpgsqlCommand("INSERT INTO todoitem (title, createddate) VALUES (@title, @createddate)", con);
-        cmd.Parameters.AddWithValue("title", todoItem.Title);
+        var cmd = new NpgsqlCommand("INSERT INTO todoitem (title, createddate) VALUES (@title, @createddate) RETURNING *", con);
+        cmd.Parameters.AddWithValue("title", title);
         cmd.Parameters.AddWithValue("createddate", DateTime.Now);
 
         try
@@ -111,9 +112,44 @@ public class HomeController(ILogger<HomeController> logger) : Controller
 
             Console.WriteLine(ex);
         }
-        return Redirect("http://localhost:5241");
+        var reader = cmd.ExecuteReader();
+        if (reader.HasRows)
+        {
+            reader.Read();
+            todoItem.Id = reader.GetInt32(0);
+            todoItem.Title = reader.GetString(1);
+            todoItem.CreatedDate = reader.GetDateTime(2);
+            if (!reader.IsDBNull(3))
+            {
+                todoItem.CompletedDate = reader.GetFieldValue<DateTime?>(3);
+            }
+
+        }
+        return Json(todoItem);
     }
-    [HttpPost]
+    // [HttpPost]
+    // public RedirectResult Create(TodoItem todoItem)
+    // {
+    //     var con = new NpgsqlConnection(_connectionString);
+    //     con.Open();
+
+    //     var cmd = new NpgsqlCommand("INSERT INTO todoitem (title, createddate) VALUES (@title, @createddate)", con);
+    //     cmd.Parameters.AddWithValue("title", todoItem.Title);
+    //     cmd.Parameters.AddWithValue("createddate", DateTime.Now);
+
+    //     try
+    //     {
+    //         cmd.ExecuteNonQuery();
+
+    //     }
+    //     catch (Exception ex)
+    //     {
+
+    //         Console.WriteLine(ex);
+    //     }
+    //     return Redirect("http://localhost:5241");
+    // }
+    [HttpDelete]
     public JsonResult Delete(int id)
     {
         var con = new NpgsqlConnection(_connectionString);

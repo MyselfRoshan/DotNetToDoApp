@@ -33,5 +33,3 @@ dotnet ef database update <MigrationName>
 ```powershell
 dotnet watch run
 ```
-## TO DO
-[ ] use htmx instead of ajax
